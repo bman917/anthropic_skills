@@ -1,3 +1,11 @@
+# /// script
+# requires-python = ">=3.10"
+# dependencies = [
+#   "defusedxml",
+#   "lxml",
+# ]
+# ///
+
 """
 Command line tool to validate Office document XML files against XSD schemas and tracked changes.
 

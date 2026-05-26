@@ -14,6 +14,8 @@ license: Proprietary. LICENSE.txt has complete terms
 | Edit or create from template | Read [editing.md](editing.md) |
 | Create from scratch | Read [pptxgenjs.md](pptxgenjs.md) |
 
+> **Note:** All `python scripts/...` commands below should be run as `uv run scripts/...` for automatic dependency installation and Python version pinning.
+
 ---
 
 ## Reading Content
@@ -23,10 +25,10 @@ license: Proprietary. LICENSE.txt has complete terms
 python -m markitdown presentation.pptx
 
 # Visual overview
-python scripts/thumbnail.py presentation.pptx
+uv run scripts/thumbnail.py presentation.pptx
 
 # Raw XML
-python scripts/office/unpack.py presentation.pptx unpacked/
+uv run scripts/office/unpack.py presentation.pptx unpacked/
 ```
 
 ---
@@ -209,7 +211,7 @@ Report ALL issues found, including minor ones.
 Convert presentations to individual slide images for visual inspection:
 
 ```bash
-python scripts/office/soffice.py --headless --convert-to pdf output.pptx
+uv run scripts/office/soffice.py --headless --convert-to pdf output.pptx
 pdftoppm -jpeg -r 150 output.pdf slide
 ```
 

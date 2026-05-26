@@ -1,3 +1,8 @@
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pypdf", "cryptography"]
+# ///
+
 import json
 import sys
 
@@ -22,9 +27,9 @@ def make_field_dict(field, field_id):
     if ft == "/Tx":
         field_dict["type"] = "text"
     elif ft == "/Btn":
-        field_dict["type"] = "checkbox"  
         states = field.get("/_States_", [])
         if len(states) == 2:
+            field_dict["type"] = "checkbox"
             if "/Off" in states:
                 field_dict["checked_value"] = states[0] if states[0] != "/Off" else states[1]
                 field_dict["unchecked_value"] = "/Off"
@@ -32,6 +37,8 @@ def make_field_dict(field, field_id):
                 print(f"Unexpected state values for checkbox `${field_id}`. Its checked and unchecked values may not be correct; if you're trying to check it, visually verify the results.")
                 field_dict["checked_value"] = states[0]
                 field_dict["unchecked_value"] = states[1]
+        else:
+            field_dict["type"] = "unknown (checkbox with unreadable states)"
     elif ft == "/Ch":
         field_dict["type"] = "choice"
         states = field.get("/_States_", [])

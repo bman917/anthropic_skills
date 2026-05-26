@@ -6,24 +6,64 @@ license: Proprietary. LICENSE.txt has complete terms
 
 # PDF Processing Guide
 
-## Overview
+## START HERE: Pick Your Path
 
-This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see REFERENCE.md. If you need to fill out a PDF form, read FORMS.md and follow its instructions.
+**Before writing any code**, use this table to find the right approach:
 
-## Quick Start
+| What you need to do | What to do |
+|---|---|
+| Fill a PDF form (fillable or not) | **Read `FORMS.md` and follow it exactly. Do not skip ahead.** |
+| Convert PDF pages to images | `uv run scripts/convert_pdf_to_images.py <input.pdf> <output_dir/>` |
+| Extract text or tables | Use `pdfplumber` (see Python Libraries below) |
+| Merge, split, or rotate pages | Use `pypdf` (see Python Libraries below) |
+| Create a new PDF from scratch | Use `reportlab` (see Python Libraries below) |
+| OCR a scanned PDF | Use `pytesseract` + `pdf2image` (see Common Tasks below) |
+| Encrypt or decrypt a PDF | Use `pypdf` or `qpdf` (see Python Libraries or Command-Line Tools) |
+
+**Prefer the pre-built scripts over writing new code.** If a script in `scripts/` covers the task, use it. Only write custom code when no existing script applies.
+
+## Running Scripts
+
+All scripts in `scripts/` use [PEP 723 inline metadata](https://peps.python.org/pep-0723/) and run with `uv run`. No venv or `pip install` needed — `uv` installs dependencies automatically on first run.
+
+```bash
+# Check if PDF has fillable fields
+uv run scripts/check_fillable_fields.py input.pdf
+
+# Convert PDF pages to PNG images
+uv run scripts/convert_pdf_to_images.py input.pdf output_dir/
+
+# Extract fillable form field info to JSON
+uv run scripts/extract_form_field_info.py input.pdf field_info.json
+
+# Fill a PDF with fillable fields
+uv run scripts/fill_fillable_fields.py input.pdf field_values.json output.pdf
+
+# Fill a non-fillable PDF using text annotations
+uv run scripts/fill_pdf_form_with_annotations.py input.pdf fields.json output.pdf
+
+# Extract text/line/checkbox structure from a non-fillable PDF
+uv run scripts/extract_form_structure.py input.pdf structure.json
+
+# Validate bounding boxes before filling
+uv run scripts/check_bounding_boxes.py fields.json
+
+# Create a validation image showing bounding boxes overlaid on a page
+uv run scripts/create_validation_image.py <page_num> fields.json input_image.png output_image.png
+```
+
+When writing a new standalone script, always add a PEP 723 header:
 
 ```python
-from pypdf import PdfReader, PdfWriter
-
-# Read a PDF
-reader = PdfReader("document.pdf")
-print(f"Pages: {len(reader.pages)}")
-
-# Extract text
-text = ""
-for page in reader.pages:
-    text += page.extract_text()
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pypdf", "pdfplumber"]
+# ///
 ```
+
+## Overview
+
+This guide covers essential PDF processing operations. For advanced features, JavaScript libraries, and additional examples, see `REFERENCE.md`. For form filling, read `FORMS.md`.
 
 ## Python Libraries
 
@@ -231,15 +271,20 @@ pdftk input.pdf rotate 1east output rotated.pdf
 ## Common Tasks
 
 ### Extract Text from Scanned PDFs
+
+Use `uv run` with a PEP 723 header for inline dependency management:
+
 ```python
-# Requires: pip install pytesseract pdf2image
+# /// script
+# requires-python = ">=3.11"
+# dependencies = ["pytesseract", "pdf2image", "Pillow"]
+# ///
+
 import pytesseract
 from pdf2image import convert_from_path
 
-# Convert PDF to images
 images = convert_from_path('scanned.pdf')
 
-# OCR each page
 text = ""
 for i, image in enumerate(images):
     text += f"Page {i+1}:\n"
